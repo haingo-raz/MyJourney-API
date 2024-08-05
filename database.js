@@ -7,14 +7,24 @@ const db = mysql.createConnection({
     database: 'myjourney'
 })
 
-function login(res, user){
-    let sql = "SELECT * FROM users WHERE email = '" + user.email + "' AND password = '" + user.password + "'";
+function getUserByEmail(email, callback) {
+    let sql = "SELECT * FROM users WHERE email = '" + email + "'";
+    db.query(sql, (err, result) => {
+        if (err) return callback(err, null);
+        else {
+            console.log(result[0])
+            return callback(null, result[0]);
+        }
+        
+    });
+}
+
+function signUp(res, email, password_crypted) {
+    let sql = "INSERT INTO users (email, password) VALUES ('" + email + "', '" + password_crypted + "')";
 
     db.query(sql, (err, result) => {
         if (err) return res.json(err);
-        if (result.length > 0) 
-            return res.json("Success");
-        else return res.json("Invalid email or password");
+        return res.json("Success");
     });
 }
 
@@ -48,6 +58,7 @@ function getWorkout(res){
 }
 
 module.exports.getWorkout = getWorkout;
-module.exports.login = login;
+module.exports.getUserByEmail = getUserByEmail;
+module.exports.signUp = signUp;
 module.exports.addWorkout = addWorkout;
 module.exports.deleteWorkoutById = deleteWorkoutById;

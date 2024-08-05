@@ -2,9 +2,11 @@ const express = require('express');
 var bodyParser = require('body-parser')
 const cors = require('cors');
 const db = require('./database')
+const bcrypt = require('bcrypt');
 
 // Initialize express
 const app = express()
+const salt = 10;
 app.use(cors())
 app.use(bodyParser.json())
 
@@ -14,17 +16,45 @@ app.get("/", (req, res) => {
 })
 
 app.post("/login", login)
+app.post("/signup", signUp)
 app.post("/add", addWorkout)
 
 app.get("/workout", getWorkout)
 
 app.delete("/delete/:id", deleteWorkoutById)
 
-function login(req, res){
-    let user = req.body;
-    console.log("User: ", JSON.stringify(user))
-    if (user.email && user.password) {
-        db.login(res, user)
+async function login(req, res){
+    try{
+        const {email, password}=req.body;
+        // Retrieve the user from the database from the email
+        db.getUserByEmail(email, (err, user) => {
+            if(err){
+                console.log("Error: ", err)
+            } else if(user){
+                const validPass = bcrypt.compare(password, user.password)
+                if(validPass){
+                    res.status(200).json("Success")
+                } else {
+                    res.json("Invalid email or password")
+                }
+            } else {
+                res.status(400).json("User not found")
+            }
+        })
+    } catch(err){
+        console.log("Error: ", err)
+    }
+}
+
+async function signUp(req, res){
+    const {email, password}=req.body;
+
+    // encrypt password before storing into database
+    const password_crypted = await bcrypt.hash(password,salt);
+
+    console.log("User:")
+    if (email && password_crypted) {
+        db.signUp(res, email, password_crypted)
     } else {
         res.status(400).json({ error: 'Username and password are required' });
     }
