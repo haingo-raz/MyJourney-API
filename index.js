@@ -19,7 +19,7 @@ app.post("/login", login)
 app.post("/signup", signUp)
 app.post("/add", addWorkout)
 
-app.get("/workout", getWorkout)
+app.get("/workout/:email", getWorkoutByUser)
 
 app.delete("/delete/:id", deleteWorkoutById)
 
@@ -28,12 +28,13 @@ async function login(req, res){
         const {email, password}=req.body;
         // Retrieve the user from the database from the email
         db.getUserByEmail(email, (err, user) => {
+            
             if(err){
                 console.log("Error: ", err)
             } else if(user){
-                const validPass = bcrypt.compare(password, user.password)
+                const validPass = bcrypt.compare(password, password_crypted )
                 if(validPass){
-                    res.status(200).json("Success")
+                    res.status(200).json({ message: "Success", email: user.email });
                 } else {
                     res.json("Invalid email or password")
                 }
@@ -63,7 +64,7 @@ async function signUp(req, res){
 function addWorkout(req, res){
     let workout = req.body;
     console.log("Workout: ", JSON.stringify(workout))
-    if (workout.user_email && workout.videoUrl && workout.title && workout.duration) {
+    if (workout) {
         db.addWorkout(res, workout)
     } else {
         res.status(400).json({ error: 'Email, videoUrl, titl and duration are required' });
@@ -76,8 +77,9 @@ function deleteWorkoutById(req, res){
     db.deleteWorkoutById(res, id)
 }
 
-function getWorkout(req, res){
-    db.getWorkout(res)
+function getWorkoutByUser(req, res){
+    let email = req.params.email;
+    db.getWorkoutByUser(res, email)
 }
 
 // Start the server on port 8080

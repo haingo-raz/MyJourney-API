@@ -29,7 +29,7 @@ function signUp(res, email, password_crypted) {
 }
 
 function addWorkout(res, workout){
-    let sql = "INSERT INTO workout (user_email, videoUrl, title, duration) VALUES ('" + workout.user_email + "', '" + workout.videoUrl + "', '" + workout.title + "', '" + workout.duration + "')";
+    let sql = "INSERT INTO workout (title, videoUrl, duration, user_email, dayCreated) VALUES ('" + workout.title + "', '" + workout.videoUrl + "', '" + workout.duration + "', '" + workout.user_email + "', '" + workout.dayCreated +"')";
 
     db.query(sql, (err, result) => {
         if (err) return res.json(err);
@@ -47,8 +47,9 @@ function deleteWorkoutById(res, id){
     });
 }
 
-function getWorkout(res){
-    let sql = "SELECT * FROM workout";
+function getWorkoutByUser(res, email){
+    let sql = "SELECT * FROM workout WHERE user_email = '" + email + "'";
+    console.log("SQL: ", sql)
 
     //Execute query and output results
     db.query(sql, (err, result) => {
@@ -57,7 +58,7 @@ function getWorkout(res){
     });
 }
 
-module.exports.getWorkout = getWorkout;
+module.exports.getWorkoutByUser = getWorkoutByUser;
 module.exports.getUserByEmail = getUserByEmail;
 module.exports.signUp = signUp;
 module.exports.addWorkout = addWorkout;
