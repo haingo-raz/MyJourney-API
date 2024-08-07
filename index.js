@@ -21,6 +21,8 @@ app.post("/add", addWorkout)
 
 app.get("/workout/:email", getWorkoutByUser)
 
+app.put("/edit/:id", editWorkoutById)
+
 app.delete("/delete/:id", deleteWorkoutById)
 
 async function login(req, res){
@@ -67,7 +69,17 @@ function addWorkout(req, res){
     if (workout) {
         db.addWorkout(res, workout)
     } else {
-        res.status(400).json({ error: 'Email, videoUrl, titl and duration are required' });
+        res.status(400).json({ error: 'Email, videoUrl, title and duration are required' });
+    }
+}
+
+function editWorkoutById(req, res){
+    let workout = req.body;
+    console.log("Workout to edit: ", JSON.stringify(workout))
+    if (workout) {
+        db.editWorkoutById(res, workout)
+    } else {
+        res.status(400).json({ error: 'Email, videoUrl, title and duration are required' });
     }
 }
 

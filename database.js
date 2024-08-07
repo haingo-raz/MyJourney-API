@@ -15,7 +15,6 @@ function getUserByEmail(email, callback) {
             console.log(result[0])
             return callback(null, result[0]);
         }
-        
     });
 }
 
@@ -34,13 +33,22 @@ function addWorkout(res, workout){
     db.query(sql, (err, result) => {
         if (err) return res.json(err);
         return res.json("Success");
+    });
+}
 
+function editWorkoutById(res, workout){
+    let sql = "UPDATE workout SET title = '" + workout.title + "', videoUrl = '" + workout.videoUrl + "', duration = '" + workout.duration + "' WHERE workoutId = " + workout.workoutId;
+    console.log("SQL to update: ", sql)
+
+    db.query(sql, (err, result) => {
+        if (err) return res.json(err);
+        return res.json("Success");
     });
 }
 
 function deleteWorkoutById(res, id){
-    let sql = "DELETE FROM workout WHERE id = " + id;
-
+    let sql = "DELETE FROM workout WHERE workoutId = " + id;
+    console.log("SQL query: ", sql);
     db.query(sql, (err, result) => {
         if (err) return res.json(err);
         return res.json(result);
@@ -49,7 +57,7 @@ function deleteWorkoutById(res, id){
 
 function getWorkoutByUser(res, email){
     let sql = "SELECT * FROM workout WHERE user_email = '" + email + "'";
-    console.log("SQL: ", sql)
+    console.log("SQL query: ", sql)
 
     //Execute query and output results
     db.query(sql, (err, result) => {
@@ -62,4 +70,5 @@ module.exports.getWorkoutByUser = getWorkoutByUser;
 module.exports.getUserByEmail = getUserByEmail;
 module.exports.signUp = signUp;
 module.exports.addWorkout = addWorkout;
+module.exports.editWorkoutById = editWorkoutById;
 module.exports.deleteWorkoutById = deleteWorkoutById;
