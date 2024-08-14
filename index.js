@@ -19,7 +19,7 @@ app.post("/login", login)
 app.post("/signup", signUp)
 app.post("/add", addWorkout)
 
-app.get("/workout/:email", getWorkoutByUser)
+app.get("/workout/:email/:date", getWorkoutByUserAndDate)
 
 app.put("/edit/:id", editWorkoutById)
 
@@ -89,9 +89,10 @@ function deleteWorkoutById(req, res){
     db.deleteWorkoutById(res, id)
 }
 
-function getWorkoutByUser(req, res){
+function getWorkoutByUserAndDate(req, res){
     let email = req.params.email;
-    db.getWorkoutByUser(res, email)
+    let date = req.params.date;
+    db.getWorkoutByUserAndDate(res, email, date)
 }
 
 // Start the server on port 8080

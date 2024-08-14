@@ -55,8 +55,8 @@ function deleteWorkoutById(res, id){
     });
 }
 
-function getWorkoutByUser(res, email){
-    let sql = "SELECT * FROM workout WHERE user_email = '" + email + "'";
+function getWorkoutByUserAndDate(res, email, date){
+    let sql = "SELECT * FROM workout WHERE user_email = '" + email + "' AND dayCreated = '" + date + "'";
     console.log("SQL query: ", sql)
 
     //Execute query and output results
@@ -66,7 +66,7 @@ function getWorkoutByUser(res, email){
     });
 }
 
-module.exports.getWorkoutByUser = getWorkoutByUser;
+module.exports.getWorkoutByUserAndDate = getWorkoutByUserAndDate;
 module.exports.getUserByEmail = getUserByEmail;
 module.exports.signUp = signUp;
 module.exports.addWorkout = addWorkout;
