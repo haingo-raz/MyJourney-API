@@ -55,16 +55,45 @@ function deleteWorkoutById(res, id){
     });
 }
 
-function getWorkoutByUserAndDate(res, email, date){
-    let sql = "SELECT * FROM workout WHERE user_email = '" + email + "' AND dayCreated = '" + date + "'";
-    console.log("SQL query: ", sql)
+function getWorkoutByUserAndDate(res, email, date) {
+    // SQL query to get the count of workouts and the total duration
+    const aggregateSql = `
+        SELECT 
+            COUNT(*) AS workoutCount, 
+            SUM(duration) AS totalDuration 
+        FROM workout 
+        WHERE user_email = ? 
+          AND dayCreated = ?
+    `;
+    
+    // SQL query to get all the workout results
+    const detailsSql = `
+        SELECT * 
+        FROM workout 
+        WHERE user_email = ? 
+          AND dayCreated = ?
+    `;
 
-    //Execute query and output results
-    db.query(sql, (err, result) => {
-    if (err) return res.json(err);
-    return res.json(result);
+    // Execute aggregate query
+    db.query(aggregateSql, [email, date], (err, aggregateResult) => {
+        if (err) return res.json(err);
+
+        // Get the workout results
+        db.query(detailsSql, [email, date], (err, detailsResult) => {
+            if (err) return res.json(err);
+
+            // Combine the results
+            const response = {
+                count: aggregateResult[0].workoutCount,
+                totalDuration: aggregateResult[0].totalDuration,
+                workouts: detailsResult
+            };
+
+            return res.json(response);
+        });
     });
 }
+
 
 module.exports.getWorkoutByUserAndDate = getWorkoutByUserAndDate;
 module.exports.getUserByEmail = getUserByEmail;
