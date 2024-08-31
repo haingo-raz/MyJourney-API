@@ -29,14 +29,14 @@ app.delete("/delete/:id", deleteWorkoutById)
 
 async function login(req, res){
     try{
-        const {email, password}=req.body;
+        const userInfo =req.body;
         // Retrieve the user from the database from the email
-        db.getUserByEmail(email, (err, user) => {
-            
+        db.getUserByEmail(userInfo.email, async (err, user) => { 
             if(err){
                 console.log("Error: ", err)
+                res.status(500).json({ message: "Internal server error" })
             } else if(user){
-                const validPass = bcrypt.compare(password, password_crypted )
+                const validPass = await bcrypt.compare(userInfo.password, user.password)
                 if(validPass){
                     res.status(200).json({ message: "Success", email: user.email });
                 } else {
@@ -57,7 +57,6 @@ async function signUp(req, res){
     // encrypt password before storing into database
     const password_crypted = await bcrypt.hash(password,salt);
 
-    console.log("User:")
     if (email && password_crypted) {
         db.signUp(res, email, password_crypted)
     } else {
