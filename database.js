@@ -1,99 +1,97 @@
-const mysql = require('mysql');
+const sql = require('mssql');
+require('dotenv').config();
 
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'myjourney'
-})
+// Configuration for the database connection
+const config = {
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    server: process.env.DB_SERVER,
+    port: 1433,
+    database: process.env.DB_NAME,
+    authentication: {
+        type: 'default'
+    },
+    options: {
+        encrypt: true
+    }
+};
 
-function getUserByEmail(email, callback) {
-    let sql = "SELECT * FROM users WHERE email = '" + email + "'";
-    db.query(sql, (err, result) => {
-        if (err) return callback(err, null);
-        else {
-            console.log(result[0])
-            return callback(null, result[0]);
-        }
-    });
+console.log("Starting...");
+
+async function connectToDatabase() {
+    try {
+        await sql.connect(config);
+        console.log('Connected to the database');
+    } catch (err) {
+        console.error('Database connection failed: ', err);
+    }
 }
 
-function signUp(res, email, password_crypted) {
-    let sql = "INSERT INTO users (email, password) VALUES ('" + email + "', '" + password_crypted + "')";
+async function getUserByEmail(email, callback) {
+    try {
+        const result = await sql.query`SELECT * FROM users WHERE email = ${email}`;
+        console.log(result.recordset[0]);
+        return callback(null, result.recordset[0]);
+    } catch (err) {
+        return callback(err, null);
+    }
+}
 
-    db.query(sql, (err, result) => {
-        if (err) return res.json(err);
+async function signUp(res, email, password_crypted) {
+    try {
+        await sql.query`INSERT INTO users (email, password) VALUES (${email}, ${password_crypted})`;
         return res.json("Success");
-    });
+    } catch (err) {
+        return res.json(err);
+    }
 }
 
-function addWorkout(res, workout){
-    let sql = "INSERT INTO workout (title, videoUrl, duration, user_email, dayCreated) VALUES ('" + workout.title + "', '" + workout.videoUrl + "', '" + workout.duration + "', '" + workout.user_email + "', '" + workout.dayCreated +"')";
-
-    db.query(sql, (err, result) => {
-        if (err) return res.json(err);
+async function addWorkout(res, workout) {
+    try {
+        await sql.query`INSERT INTO workout (title, videoUrl, duration, user_email, dayCreated) VALUES (${workout.title}, ${workout.videoUrl}, ${workout.duration}, ${workout.user_email}, ${workout.dayCreated})`;
         return res.json("Success");
-    });
+    } catch (err) {
+        return res.json(err);
+    }
 }
 
-function editWorkoutById(res, workout){
-    let sql = "UPDATE workout SET title = '" + workout.title + "', videoUrl = '" + workout.videoUrl + "', duration = '" + workout.duration + "' WHERE workoutId = " + workout.workoutId;
-    console.log("SQL to update: ", sql)
-
-    db.query(sql, (err, result) => {
-        if (err) return res.json(err);
+async function editWorkoutById(res, workout) {
+    try {
+        await sql.query`UPDATE workout SET title = ${workout.title}, videoUrl = ${workout.videoUrl}, duration = ${workout.duration} WHERE workoutId = ${workout.workoutId}`;
         return res.json("Success");
-    });
+    } catch (err) {
+        return res.json(err);
+    }
 }
 
-function deleteWorkoutById(res, id){
-    let sql = "DELETE FROM workout WHERE workoutId = " + id;
-    console.log("SQL query: ", sql);
-    db.query(sql, (err, result) => {
-        if (err) return res.json(err);
-        return res.json(result);
-    });
+async function deleteWorkoutById(res, id) {
+    try {
+        await sql.query`DELETE FROM workout WHERE workoutId = ${id}`;
+        return res.json("Success");
+    } catch (err) {
+        return res.json(err);
+    }
 }
 
-function getWorkoutByUserAndDate(res, email, date) {
-    // SQL query to get the count of workouts and the total duration
-    const aggregateSql = `
-        SELECT 
-            COUNT(*) AS workoutCount, 
-            SUM(duration) AS totalDuration 
-        FROM workout 
-        WHERE user_email = ? 
-          AND dayCreated = ?
-    `;
-    
-    // SQL query to get all the workout results
-    const detailsSql = `
-        SELECT * 
-        FROM workout 
-        WHERE user_email = ? 
-          AND dayCreated = ?
-    `;
+async function getWorkoutByUserAndDate(res, email, date) {
+    try {
+        const aggregateResult = await sql.query`SELECT COUNT(*) AS workoutCount, SUM(duration) AS totalDuration FROM workout WHERE user_email = ${email} AND dayCreated = ${date}`;
+        const detailsResult = await sql.query`SELECT * FROM workout WHERE user_email = ${email} AND dayCreated = ${date}`;
+        
+        const response = {
+            count: aggregateResult.recordset[0].workoutCount,
+            totalDuration: aggregateResult.recordset[0].totalDuration,
+            workouts: detailsResult.recordset
+        };
 
-    // Execute aggregate query
-    db.query(aggregateSql, [email, date], (err, aggregateResult) => {
-        if (err) return res.json(err);
-
-        // Get the workout results
-        db.query(detailsSql, [email, date], (err, detailsResult) => {
-            if (err) return res.json(err);
-
-            // Combine the results
-            const response = {
-                count: aggregateResult[0].workoutCount,
-                totalDuration: aggregateResult[0].totalDuration,
-                workouts: detailsResult
-            };
-
-            return res.json(response);
-        });
-    });
+        return res.json(response);
+    } catch (err) {
+        return res.json(err);
+    }
 }
 
+// Connect to the database
+connectToDatabase();
 
 module.exports.getWorkoutByUserAndDate = getWorkoutByUserAndDate;
 module.exports.getUserByEmail = getUserByEmail;

@@ -3,6 +3,8 @@ var bodyParser = require('body-parser')
 const cors = require('cors');
 const db = require('./database')
 const bcrypt = require('bcrypt');
+require('dotenv').config();
+
 
 // Initialize express
 const app = express()
