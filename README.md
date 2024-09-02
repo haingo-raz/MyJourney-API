@@ -1,5 +1,5 @@
 # About 
-Node.js API for the [MyJourney](https://github.com/haing-raz/MyJourney) web application.
+Node.js API for the [MyJourney](https://github.com/haingo-raz/MyJourney) web application.
 
 # Technology
 - Node.js/Express
