@@ -92,6 +92,26 @@ async function getWorkoutByUserAndDate(res, email, date) {
     }
 }
 
+async function updateEmail(res, email, newEmail) {
+    const transaction = new sql.Transaction();
+    try {
+        await transaction.begin();
+        // Disable the foreign key constraint
+        await transaction.request().query(`ALTER TABLE workout NOCHECK CONSTRAINT FK_users`);
+        // Update the email in the workout table first
+        await transaction.request().query(`UPDATE workout SET user_email = '${newEmail}' WHERE user_email = '${email}'`);
+        // Update the email in the users table
+        await transaction.request().query(`UPDATE users SET email = '${newEmail}' WHERE email = '${email}'`);
+        // Re-enable the foreign key constraint
+        await transaction.request().query(`ALTER TABLE workout CHECK CONSTRAINT FK_users`);
+        await transaction.commit();
+        return res.json("Success");
+    } catch (err) {
+        await transaction.rollback();
+        return res.json(err);
+    }
+}
+
 // Connect to the database
 connectToDatabase();
 
@@ -101,3 +121,4 @@ module.exports.signUp = signUp;
 module.exports.addWorkout = addWorkout;
 module.exports.editWorkoutById = editWorkoutById;
 module.exports.deleteWorkoutById = deleteWorkoutById;
+module.exports.updateEmail = updateEmail;

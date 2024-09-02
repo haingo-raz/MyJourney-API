@@ -24,6 +24,7 @@ app.post("/add", addWorkout)
 app.get("/workout/:email/:date", getWorkoutByUserAndDate)
 
 app.put("/edit/:id", editWorkoutById)
+app.put("/update-email", updateEmail)
 
 app.delete("/delete/:id", deleteWorkoutById)
 
@@ -96,6 +97,29 @@ function getWorkoutByUserAndDate(req, res){
     let email = req.params.email;
     let date = req.params.date;
     db.getWorkoutByUserAndDate(res, email, date)
+}
+
+function updateEmail(req, res){
+    try {
+        let email = req.body.email;
+        let newEmail = req.body.newEmail;
+        let password = req.body.password;
+        db.getUserByEmail(email, async (err, user) => {
+            if (err) {
+                console.log("Error: ", err) 
+                res.status(500).json({ message: "Internal server error" })
+            } else if (user) {
+                const validPass = await bcrypt.compare(password, user.password)
+                if (validPass) {
+                    db.updateEmail(res, email, newEmail)
+                } else {
+                    res.json("Invalid password")
+                }
+            }
+        })
+    } catch (err) {
+        console.log("Error: ", err)
+    }
 }
 
 // Start the server on port 8080
