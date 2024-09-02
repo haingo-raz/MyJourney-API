@@ -48,9 +48,11 @@ async function signUp(res, email, password_crypted) {
 
 async function addWorkout(res, workout) {
     try {
-        await sql.query`INSERT INTO workout (title, videoUrl, duration, user_email, dayCreated) VALUES (${workout.title}, ${workout.videoUrl}, ${workout.duration}, ${workout.user_email}, ${workout.dayCreated})`;
+        const query = `INSERT INTO workout (title, videoUrl, duration, user_email, dayCreated, status) VALUES ('${workout.title}', '${workout.videoUrl}', ${workout.duration}, '${workout.user_email}', '${workout.dayCreated}', '${workout.status}')`;
+        await sql.query(query);
         return res.json("Success");
     } catch (err) {
+        console.log("Error executing query: ", err);
         return res.json(err);
     }
 }

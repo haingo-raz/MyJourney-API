@@ -64,11 +64,13 @@ async function signUp(req, res){
     }
 }
 
-function addWorkout(req, res){
+function addWorkout(req, res) {
     let workout = req.body;
-    console.log("Workout: ", JSON.stringify(workout))
+    console.log("Workout: ", JSON.stringify(workout));
     if (workout) {
         db.addWorkout(res, workout)
+            .then(() => console.log('added workout'))
+            .catch(err => console.log(err));
     } else {
         res.status(400).json({ error: 'Email, videoUrl, title and duration are required' });
     }
