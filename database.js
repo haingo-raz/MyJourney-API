@@ -112,13 +112,25 @@ async function updateEmail(res, email, newEmail) {
     }
 }
 
+async function updatePassword (res, email, password_crypted) {
+    try {
+        await sql.query`UPDATE users SET password = ${password_crypted} WHERE email = ${email}`;
+        return res.json("Success");
+    } catch (err) {
+        return res.json(err);
+    }
+}
+
 // Connect to the database
 connectToDatabase();
 
-module.exports.getWorkoutByUserAndDate = getWorkoutByUserAndDate;
-module.exports.getUserByEmail = getUserByEmail;
-module.exports.signUp = signUp;
-module.exports.addWorkout = addWorkout;
-module.exports.editWorkoutById = editWorkoutById;
-module.exports.deleteWorkoutById = deleteWorkoutById;
-module.exports.updateEmail = updateEmail;
+module.exports = {
+    getWorkoutByUserAndDate,
+    getUserByEmail,
+    signUp,
+    addWorkout,
+    editWorkoutById,
+    deleteWorkoutById,
+    updateEmail,
+    updatePassword
+};

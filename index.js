@@ -25,6 +25,7 @@ app.get("/workout/:email/:date", getWorkoutByUserAndDate)
 
 app.put("/edit/:id", editWorkoutById)
 app.put("/update-email", updateEmail)
+app.put("/update-password", updatePassword)
 
 app.delete("/delete/:id", deleteWorkoutById)
 
@@ -112,6 +113,30 @@ function updateEmail(req, res){
                 const validPass = await bcrypt.compare(password, user.password)
                 if (validPass) {
                     db.updateEmail(res, email, newEmail)
+                } else {
+                    res.json("Invalid password")
+                }
+            }
+        })
+    } catch (err) {
+        console.log("Error: ", err)
+    }
+}
+
+function updatePassword(req, res){
+    try {
+        let email = req.body.email;
+        let password = req.body.password;
+        let newPassword = req.body.newPassword;
+        db.getUserByEmail(email, async (err, user) => {
+            if (err) {
+                console.log("Error: ", err) 
+                res.status(500).json({ message: "Internal server error" })
+            } else if (user) {
+                const validPass = await bcrypt.compare(password, user.password)
+                if (validPass) {
+                    const new_password_crypted = await bcrypt.hash(newPassword, salt);
+                    db.updatePassword(res, email, new_password_crypted)
                 } else {
                     res.json("Invalid password")
                 }
