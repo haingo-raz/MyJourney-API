@@ -1,66 +1,56 @@
-const sql = require('mssql');
+const mysql = require('mysql');
 require('dotenv').config();
 
 // Configuration for the database connection
-const config = {
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    server: process.env.DB_SERVER,
-    port: 1433,
-    database: process.env.DB_NAME,
-    authentication: {
-        type: 'default'
-    },
-    options: {
-        encrypt: true
-    }
-};
+const db = mysql.createConnection({
+    host: process.env.DB_HOST,
+    user: process.env.DB_MYSQL_USER,
+    password: process.env.DB_MYSQL_PASSWORD,
+    database: process.env.DB_MYSQL_DATABASE
+});
 
 console.log("Starting...");
 
-async function connectToDatabase() {
-    try {
-        await sql.connect(config);
-        console.log('Connected to the database');
-    } catch (err) {
-        console.error('Database connection failed: ', err);
-    }
-}
-
 async function getUserByEmail(email, callback) {
-    try {
-        const result = await sql.query`SELECT * FROM users WHERE email = ${email}`;
-        console.log(result.recordset[0]);
-        return callback(null, result.recordset[0]);
-    } catch (err) {
-        return callback(err, null);
-    }
+    let sql = `SELECT * FROM users WHERE email = '${email}'`;
+    db.query(sql, (err, result) => {
+        if (err) return res.json(err);
+        else {
+            console.log(result[0])
+            return callback(null, result[0]);
+        }
+    });
 }
 
 async function signUp(res, email, password_crypted) {
-    try {
-        await sql.query`INSERT INTO users (email, password) VALUES (${email}, ${password_crypted})`;
+    let sql = `INSERT INTO users (email, password) VALUES ('${email}', '${password_crypted}')`;
+    console.log("SQL query: ",   sql);
+    db.query(sql, (err, result) => {
+        if (err) return console.log(err);
         return res.json("Success");
-    } catch (err) {
-        return res.json(err);
-    }
+    });
 }
 
 async function addWorkout(res, workout) {
     try {
-        const query = `INSERT INTO workout (title, videoUrl, duration, user_email, dayCreated, status) VALUES ('${workout.title}', '${workout.videoUrl}', ${workout.duration}, '${workout.user_email}', '${workout.dayCreated}', '${workout.status}')`;
-        await sql.query(query);
-        return res.json("Success");
+        let sql =  `INSERT INTO workout (title, videoUrl, duration, user_email, dayCreated, status) VALUES ('${workout.title}', '${workout.videoUrl}', ${workout.duration}, '${workout.user_email}', '${workout.dayCreated}', '${workout.status}')`;
+        db.query(sql, (err, result) => {
+            if (err) return console.log(err);
+            return res.json("Success");
+        });
     } catch (err) {
-        console.log("Error executing query: ", err);
         return res.json(err);
     }
 }
 
 async function editWorkoutById(res, workout) {
     try {
-        await sql.query`UPDATE workout SET title = ${workout.title}, videoUrl = ${workout.videoUrl}, duration = ${workout.duration} WHERE workoutId = ${workout.workoutId}`;
-        return res.json("Success");
+        let sql = `UPDATE workout SET title = '${workout.title}', videoUrl = '${workout.videoUrl}', duration = ${workout.duration} WHERE workoutId = ${workout.workoutId}`;
+        console.log("SQL to update: ", sql);
+        db.query(sql, (err, result) => {
+            if (err) return console.log(err);
+            return res.json("Success");
+        });
     } catch (err) {
         return res.json(err);
     }
@@ -68,61 +58,90 @@ async function editWorkoutById(res, workout) {
 
 async function deleteWorkoutById(res, id) {
     try {
-        await sql.query`DELETE FROM workout WHERE workoutId = ${id}`;
-        return res.json("Success");
+        let sql = `DELETE FROM workout WHERE workoutId = ${id}`;
+        console.log("SQL query: ", sql);
+        db.query(sql, (err, result) => {
+            return res.json("Success");
+        });
     } catch (err) {
         return res.json(err);
     }
 }
 
-async function getWorkoutByUserAndDate(res, email, date) {
-    try {
-        const aggregateResult = await sql.query`SELECT COUNT(*) AS workoutCount, SUM(duration) AS totalDuration FROM workout WHERE user_email = ${email} AND dayCreated = ${date}`;
-        const detailsResult = await sql.query`SELECT * FROM workout WHERE user_email = ${email} AND dayCreated = ${date}`;
-        
-        const response = {
-            count: aggregateResult.recordset[0].workoutCount,
-            totalDuration: aggregateResult.recordset[0].totalDuration,
-            workouts: detailsResult.recordset
-        };
+function getWorkoutByUserAndDate(res, email, date) {
+    const aggregateSql = `
+        SELECT 
+            COUNT(*) AS workoutCount, 
+            SUM(duration) AS totalDuration 
+        FROM workout 
+        WHERE user_email = ? 
+          AND dayCreated = ?
+    `;
+    
+    const detailsSql = `
+        SELECT * 
+        FROM workout 
+        WHERE user_email = ? 
+          AND dayCreated = ?
+    `;
 
-        return res.json(response);
-    } catch (err) {
-        return res.json(err);
-    }
+    db.query(aggregateSql, [email, date], (err, aggregateResult) => {
+        console.log("Aggregate SQL query: ", aggregateSql);
+        if (err) return err.json(err);
+
+        db.query(detailsSql, [email, date], (err, detailsResult) => {
+            if (err) return err.json(err);
+
+            const response = {
+                count: aggregateResult[0].workoutCount,
+                totalDuration: aggregateResult[0].totalDuration,
+                workouts: detailsResult
+            };
+
+            return res.json(response);
+        });
+    });
 }
 
+// Not working
 async function updateEmail(res, email, newEmail) {
-    const transaction = new sql.Transaction();
+    db.beginTransaction(async (err) => {
+        if (err) {
+            return res.json(err);
+        }
+
+        try {
+            db.query(`SET FOREIGN_KEY_CHECKS = 0`);
+            db.query(`UPDATE workout SET user_email = '${newEmail}' WHERE user_email = '${email}'`);
+            db.query(`UPDATE users SET email = '${newEmail}' WHERE email = '${email}'`);
+            db.query(`SET FOREIGN_KEY_CHECKS = 1`);
+            db.commit((err) => {
+                if (err) {
+                    return db.rollback(() => {
+                        return res.json(err);
+                    });
+                }
+                return res.json("Success");
+            });
+        } catch (err) {
+            db.rollback(() => {
+                return res.json(err);
+            });
+        }
+    });
+}
+
+// To be tested
+async function updatePassword(res, email, password_crypted) {
     try {
-        await transaction.begin();
-        // Disable the foreign key constraint
-        await transaction.request().query(`ALTER TABLE workout NOCHECK CONSTRAINT FK_users`);
-        // Update the email in the workout table first
-        await transaction.request().query(`UPDATE workout SET user_email = '${newEmail}' WHERE user_email = '${email}'`);
-        // Update the email in the users table
-        await transaction.request().query(`UPDATE users SET email = '${newEmail}' WHERE email = '${email}'`);
-        // Re-enable the foreign key constraint
-        await transaction.request().query(`ALTER TABLE workout CHECK CONSTRAINT FK_users`);
-        await transaction.commit();
-        return res.json("Success");
+        let sql = `UPDATE users SET password = '${password_crypted}' WHERE email = '${email}'`;
+        db.query(sql, (err, result) => {
+            return res.json("Success");
+        });
     } catch (err) {
-        await transaction.rollback();
         return res.json(err);
     }
 }
-
-async function updatePassword (res, email, password_crypted) {
-    try {
-        await sql.query`UPDATE users SET password = ${password_crypted} WHERE email = ${email}`;
-        return res.json("Success");
-    } catch (err) {
-        return res.json(err);
-    }
-}
-
-// Connect to the database
-connectToDatabase();
 
 module.exports = {
     getWorkoutByUserAndDate,
