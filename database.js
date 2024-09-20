@@ -16,7 +16,7 @@ async function getUserByEmail(email, callback) {
     db.query(sql, (err, result) => {
         if (err) return res.json(err);
         else {
-            console.log(result[0])
+            console.log(result[0]);
             return callback(null, result[0]);
         }
     });
@@ -24,7 +24,7 @@ async function getUserByEmail(email, callback) {
 
 async function signUp(res, email, password_crypted) {
     let sql = `INSERT INTO users (email, password) VALUES ('${email}', '${password_crypted}')`;
-    console.log("SQL query: ",   sql);
+    console.log("SQL query: ", sql);
     db.query(sql, (err, result) => {
         if (err) return res.json(err);
         return res.json("Success");
@@ -33,7 +33,7 @@ async function signUp(res, email, password_crypted) {
 
 async function addWorkout(res, workout) {
     try {
-        let sql =  `INSERT INTO workout (title, videoUrl, duration, user_email, dayCreated, status) VALUES ('${workout.title}', '${workout.videoUrl}', ${workout.duration}, '${workout.user_email}', '${workout.dayCreated}', '${workout.status}')`;
+        let sql = `INSERT INTO workout (title, videoUrl, duration, user_email, dayCreated, status) VALUES ('${workout.title}', '${workout.videoUrl}', ${workout.duration}, '${workout.user_email}', '${workout.dayCreated}', '${workout.status}')`;
         db.query(sql, (err, result) => {
             if (err) return res.json(err);
             return res.json("Success");
@@ -77,7 +77,7 @@ function getWorkoutByUserAndDate(res, email, date) {
         WHERE user_email = ? 
           AND dayCreated = ?
     `;
-    
+
     const detailsSql = `
         SELECT * 
         FROM workout 
@@ -103,7 +103,6 @@ function getWorkoutByUserAndDate(res, email, date) {
     });
 }
 
-// Not working
 async function updateEmail(res, email, newEmail) {
     db.beginTransaction(async (err) => {
         if (err) {
@@ -155,7 +154,7 @@ async function deleteAccount(res, email) {
             db.commit((err) => {
                 if (err) {
                     return db.rollback(() => {
-                        return res.json(err);    
+                        return res.json(err);
                     });
                 }
                 return res.json("Success");
@@ -163,9 +162,9 @@ async function deleteAccount(res, email) {
         } catch (err) {
             db.rollback(() => {
                 return res.json(err);
-            })
+            });
         }
-    })
+    });
 }
 
 module.exports = {
