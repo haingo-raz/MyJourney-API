@@ -24,7 +24,7 @@ In progress
 2. Run `npm install`.
 
 ## MySQL database
-1. Set up the environment variables by creating a .env file. Follow the template of the example.env file. `DB_HOST` is the hostname, usually localhost. `DB_MYSQL_USER` and `DB_MYSQL_PASSWORD` are the username and password used to authenticate the connection to the MySQL database. `DB_MYSQL_DATABASE` is the name of the database with the MySQL server.
+1. Set up the environment variables by creating a .env file. Follow the template of the example.env file. `DB_HOST` is the hostname, usually localhost. `DB_MYSQL_USER` and `DB_MYSQL_PASSWORD` are the username and password used to authenticate the connection to the MySQL database. `DB_MYSQL_DATABASE` is the name of the database with the MySQL server. A dummy SQL database is made available in the [database dump](/database_dump) folder.
 2. Run `npm start` to execute the script `nodemon index.js`.
 3. Access `localhost:8080` in your browser.
 
