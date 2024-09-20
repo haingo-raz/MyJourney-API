@@ -28,6 +28,7 @@ app.put("/update-email", updateEmail)
 app.put("/update-password", updatePassword)
 
 app.delete("/delete/:id", deleteWorkoutById)
+app.delete("/delete-account", deleteAccount)
 
 async function login(req, res){
     try{
@@ -137,6 +138,28 @@ function updatePassword(req, res){
                 if (validPass) {
                     const new_password_crypted = await bcrypt.hash(newPassword, salt);
                     db.updatePassword(res, email, new_password_crypted)
+                } else {
+                    res.json("Invalid password")
+                }
+            }
+        })
+    } catch (err) {
+        console.log("Error: ", err)
+    }
+}
+
+function deleteAccount(req, res){
+    try {
+        let details = req.body;
+
+        db.getUserByEmail(details.email, async (err, user) => {
+            if (err) {
+                console.log("Error: ", err) 
+                res.status(500).json({ message: "Internal server error" })
+            } else if (user) {
+                const validPass = await bcrypt.compare(details.password, user.password)
+                if (validPass) {
+                    db.deleteAccount(res, details.email)
                 } else {
                     res.json("Invalid password")
                 }
