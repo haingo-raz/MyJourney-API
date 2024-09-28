@@ -18,6 +18,7 @@ app.get("/", (req, res) => {
 app.post("/login", login);
 app.post("/signup", signUp);
 app.post("/add", addWorkout);
+app.post("/chat", chat)
 
 app.get("/workout/:email/:date", getWorkoutByUserAndDate);
 
@@ -166,6 +167,18 @@ function deleteAccount(req, res) {
     } catch (err) {
         console.log("Error: ", err);
     }
+}
+
+function chat(req, res) {
+    const message = req.body.userMessage;
+    let response = '';
+
+    if (message.includes("hi") || message.includes("hello")) {
+        response = "Hello! Let me know how I can help you today.";
+    } else {
+        response = "We are working on this feature. Please try again later.";
+    }
+    res.json(response);
 }
 
 // Start the server on port 8080
