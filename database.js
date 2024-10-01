@@ -23,13 +23,49 @@ async function getUserByEmail(email, callback) {
 }
 
 async function signUp(res, email, password_crypted) {
-    let sql = `INSERT INTO users (email, password) VALUES ('${email}', '${password_crypted}')`;
-    console.log("SQL query: ", sql);
-    db.query(sql, (err, result) => {
-        if (err) return res.json(err);
-        return res.json("Success");
+    db.beginTransaction(async (err) => {
+        if (err) {
+            return res.json(err);
+        }
+
+        try {
+            let sql = `INSERT INTO users (email, password) VALUES ('${email}', '${password_crypted}')`;
+            let sql2 = `INSERT INTO profile (user_email) VALUES ('${email}')`;
+
+            console.log("SQL query: ", sql);
+            db.query(sql, (err, result) => {
+                if (err) {
+                    return db.rollback(() => {
+                        return res.json(err);
+                    });
+                }
+
+                db.query(sql2, (err, result) => {
+                    if (err) {
+                        return db.rollback(() => {
+                            return res.json(err);
+                        });
+                    }
+
+                    db.commit((err) => {
+                        if (err) {
+                            return db.rollback(() => {
+                                return res.json(err);
+                            });
+                        }
+                        return res.json("Success");
+                    });
+                });
+            });
+        } catch (err) {
+            db.rollback(() => {
+                return res.json(err);
+            });
+        }
     });
 }
+
+
 
 async function addWorkout(res, workout) {
     try {
@@ -167,6 +203,22 @@ async function deleteAccount(res, email) {
     });
 }
 
+function saveProfile(res, user_email, updateFields) {
+    try {
+        if (updateFields.length === 0) {
+            return res.json("No fields to update");
+        }
+        let sql = `UPDATE profile SET ${updateFields.join(', ')} WHERE user_email = '${user_email}'`;
+        console.log(sql)
+        db.query(sql, (err, result) => {
+            if (err) return res.json(err);
+            return res.json("Success");
+        });
+    } catch (err) {
+        return res.json(err);
+    }
+}
+
 module.exports = {
     getWorkoutByUserAndDate,
     getUserByEmail,
@@ -176,5 +228,6 @@ module.exports = {
     deleteWorkoutById,
     updateEmail,
     updatePassword,
-    deleteAccount
+    deleteAccount,
+    saveProfile
 };

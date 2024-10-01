@@ -25,6 +25,7 @@ app.get("/workout/:email/:date", getWorkoutByUserAndDate);
 app.put("/edit/:id", editWorkoutById);
 app.put("/update-email", updateEmail);
 app.put("/update-password", updatePassword);
+app.put("/profile", addProfile);
 
 app.delete("/delete/:id", deleteWorkoutById);
 app.delete("/delete-account", deleteAccount);
@@ -179,6 +180,27 @@ function chat(req, res) {
         response = "We are working on this feature. Please try again later.";
     }
     res.json(response);
+}
+
+function addProfile(req, res) {
+    let user_email = req.body.user_email;
+    let profileData = req.body.profileDataValue;
+    let profileDetails = {
+        age: profileData.age || null,
+        gender: profileData.gender || null,
+        height: profileData.height || null,
+        weight: profileData.weight || null,
+        dailyIntakeCalorie: profileData.dailyIntakeCalorie || null,
+        fitnessGoals: profileData.fitnessGoals || null,
+        weightGoal: profileData.weightGoal || null
+    };
+    let updateFields = [];
+    for (let key in profileDetails) {
+        if (profileDetails[key] !== null) {
+            updateFields.push(`${key} = '${profileDetails[key]}'`);
+        }
+    }
+    db.saveProfile(res, user_email, updateFields);
 }
 
 // Start the server on port 8080
