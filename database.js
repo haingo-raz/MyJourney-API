@@ -16,7 +16,6 @@ async function getUserByEmail(email, callback) {
     db.query(sql, (err, result) => {
         if (err) return res.json(err);
         else {
-            console.log(result[0]);
             return callback(null, result[0]);
         }
     });
@@ -32,7 +31,6 @@ async function signUp(res, email, password_crypted) {
             let sql = `INSERT INTO users (email, password) VALUES ('${email}', '${password_crypted}')`;
             let sql2 = `INSERT INTO profile (user_email) VALUES ('${email}')`;
 
-            console.log("SQL query: ", sql);
             db.query(sql, (err, result) => {
                 if (err) {
                     return db.rollback(() => {
@@ -82,7 +80,6 @@ async function addWorkout(res, workout) {
 async function editWorkoutById(res, workout) {
     try {
         let sql = `UPDATE workout SET title = '${workout.title}', videoUrl = '${workout.videoUrl}', duration = ${workout.duration} WHERE workoutId = ${workout.workoutId}`;
-        console.log("SQL to update: ", sql);
         db.query(sql, (err, result) => {
             if (err) return res.json(err);
             return res.json("Success");
@@ -95,7 +92,6 @@ async function editWorkoutById(res, workout) {
 async function deleteWorkoutById(res, id) {
     try {
         let sql = `DELETE FROM workout WHERE workoutId = ${id}`;
-        console.log("SQL query: ", sql);
         db.query(sql, (err, result) => {
             return res.json("Success");
         });
@@ -227,6 +223,33 @@ function getProfileDetails(res, user_email) {
     }); 
 }
 
+function getWorkoutMinutesCount(res, user_email) {
+    try {
+        let sql = `SELECT SUM(duration) AS totalDuration FROM workout WHERE user_email = '${user_email}'`;
+        console.log(sql);
+        db.query(sql, (err, result) => {
+            if (err) return res.json(err);
+            let response = `You have trained for a total of ${result[0].totalDuration} minutes.`;
+            return res.json(response);
+        });
+    } catch (err) {
+        return res.json(err);
+    }
+}
+
+function getWorkoutProgramsCount(res, user_email) {
+    try {
+        let sql = `SELECT COUNT(*) AS totalWorkouts FROM workout WHERE user_email = '${user_email}'`;
+        db.query(sql, (err, result) => {
+            if (err) return res.json(err);
+            let response = `You have completed a total of ${result[0].totalWorkouts} workout programs.`;
+            return res.json(response);
+        });
+    } catch (err) {
+        return res.json(err);
+    }
+}
+
 module.exports = {
     getWorkoutByUserAndDate,
     getUserByEmail,
@@ -238,5 +261,7 @@ module.exports = {
     updatePassword,
     deleteAccount,
     saveProfile,
-    getProfileDetails
+    getProfileDetails,
+    getWorkoutMinutesCount,
+    getWorkoutProgramsCount
 };

@@ -82,7 +82,6 @@ function addWorkout(req, res) {
 
 function editWorkoutById(req, res) {
     let workout = req.body;
-    console.log("Workout to edit: ", JSON.stringify(workout));
     if (workout) {
         db.editWorkoutById(res, workout);
     } else {
@@ -92,7 +91,6 @@ function editWorkoutById(req, res) {
 
 function deleteWorkoutById(req, res) {
     let id = req.params.id;
-    console.log("Workout to delete ID: ", id);
     db.deleteWorkoutById(res, id);
 }
 
@@ -172,15 +170,28 @@ function deleteAccount(req, res) {
 }
 
 function chat(req, res) {
-    const message = req.body.userMessage;
+    const user_email = req.body.user_email;
+    const message = req.body.user_message;
     let response = '';
+    const lowerCaseMessage = message.toLowerCase();
 
-    if (message.includes("hi") || message.includes("hello")) {
+    if (lowerCaseMessage.includes("hi") || lowerCaseMessage.includes("hello") || lowerCaseMessage.includes("hey") || lowerCaseMessage.includes("good morning") || lowerCaseMessage.includes("good afternoon") || lowerCaseMessage.includes("good evening") || lowerCaseMessage.includes("hello there")) {
         response = "Hello! Let me know how I can help you today.";
+        res.json(response);
+    } else if (lowerCaseMessage === 'ok' || lowerCaseMessage === 'okay' || lowerCaseMessage === 'thanks' || lowerCaseMessage === 'thank you') {
+        response = "Great! Let me know if you have any other questions.";
+        res.json(response);
+    } else if (lowerCaseMessage.includes("how many minutes have i spent working out since i started my journey?")) {
+        db.getWorkoutMinutesCount(res, user_email);
+    } else if (lowerCaseMessage.includes("how many workout programs have i completed so far?")) {
+        db.getWorkoutProgramsCount(res, user_email);
+    } else if (lowerCaseMessage === 'bye' || lowerCaseMessage === 'goodbye' || lowerCaseMessage === 'see you later' || lowerCaseMessage === 'see you' || lowerCaseMessage === 'talk to you later') {
+        response = "Goodbye! Have a great day!";
+        res.json(response);
     } else {
-        response = "We are working on this feature. Please try again later.";
+        response = "Please choose one of the options provided.";
+        res.json(response);
     }
-    res.json(response);
 }
 
 function addProfile(req, res) {
