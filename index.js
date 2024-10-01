@@ -21,6 +21,7 @@ app.post("/add", addWorkout);
 app.post("/chat", chat)
 
 app.get("/workout/:email/:date", getWorkoutByUserAndDate);
+app.get("/profile/:email", getProfileDetails);
 
 app.put("/edit/:id", editWorkoutById);
 app.put("/update-email", updateEmail);
@@ -201,6 +202,11 @@ function addProfile(req, res) {
         }
     }
     db.saveProfile(res, user_email, updateFields);
+}
+
+function getProfileDetails(req, res) {
+    let user_email = req.params.email;
+    db.getProfileDetails(res, user_email);
 }
 
 // Start the server on port 8080

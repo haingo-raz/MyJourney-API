@@ -219,6 +219,14 @@ function saveProfile(res, user_email, updateFields) {
     }
 }
 
+function getProfileDetails(res, user_email) {  
+    let sql = `SELECT * FROM profile WHERE user_email = '${user_email}'`;
+    db.query(sql, (err, result) => {
+        if (err) return res.json(err);
+        return res.json(result[0]);
+    }); 
+}
+
 module.exports = {
     getWorkoutByUserAndDate,
     getUserByEmail,
@@ -229,5 +237,6 @@ module.exports = {
     updateEmail,
     updatePassword,
     deleteAccount,
-    saveProfile
+    saveProfile,
+    getProfileDetails
 };
