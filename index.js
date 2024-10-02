@@ -4,6 +4,9 @@ const cors = require('cors');
 const db = require('./database');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
+const fetch = require("node-fetch");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
 
 // Initialize express
 const app = express();
@@ -19,6 +22,7 @@ app.post("/login", login);
 app.post("/signup", signUp);
 app.post("/add", addWorkout);
 app.post("/chat", chat)
+app.post("/chat/ai", chatWithAI);
 
 app.get("/workout/:email/:date", getWorkoutByUserAndDate);
 app.get("/profile/:email", getProfileDetails);
@@ -170,27 +174,32 @@ function deleteAccount(req, res) {
 }
 
 function chat(req, res) {
-    const user_email = req.body.user_email;
-    const message = req.body.user_message;
-    let response = '';
-    const lowerCaseMessage = message.toLowerCase();
-
-    if (lowerCaseMessage.includes("hi") || lowerCaseMessage.includes("hello") || lowerCaseMessage.includes("hey") || lowerCaseMessage.includes("good morning") || lowerCaseMessage.includes("good afternoon") || lowerCaseMessage.includes("good evening") || lowerCaseMessage.includes("hello there")) {
-        response = "Hello! Let me know how I can help you today.";
-        res.json(response);
-    } else if (lowerCaseMessage === 'ok' || lowerCaseMessage === 'okay' || lowerCaseMessage === 'thanks' || lowerCaseMessage === 'thank you') {
-        response = "Great! Let me know if you have any other questions.";
-        res.json(response);
-    } else if (lowerCaseMessage.includes("how many minutes have i spent working out since i started my journey?")) {
-        db.getWorkoutMinutesCount(res, user_email);
-    } else if (lowerCaseMessage.includes("how many workout programs have i completed so far?")) {
-        db.getWorkoutProgramsCount(res, user_email);
-    } else if (lowerCaseMessage === 'bye' || lowerCaseMessage === 'goodbye' || lowerCaseMessage === 'see you later' || lowerCaseMessage === 'see you' || lowerCaseMessage === 'talk to you later') {
-        response = "Goodbye! Have a great day!";
-        res.json(response);
-    } else {
-        response = "Please choose one of the options provided.";
-        res.json(response);
+    try {
+        const user_email = req.body.user_email;
+        const message = req.body.user_message;
+        let response = '';
+        const lowerCaseMessage = message.toLowerCase();
+    
+        if (lowerCaseMessage.includes("hi") || lowerCaseMessage.includes("hello") || lowerCaseMessage.includes("hey") || lowerCaseMessage.includes("good morning") || lowerCaseMessage.includes("good afternoon") || lowerCaseMessage.includes("good evening") || lowerCaseMessage.includes("hello there")) {
+            response = "Hello! Let me know how I can help you today.";
+            res.json(response);
+        } else if (lowerCaseMessage === 'ok' || lowerCaseMessage === 'okay' || lowerCaseMessage === 'thanks' || lowerCaseMessage === 'thank you') {
+            response = "Great! Let me know if you have any other questions.";
+            res.json(response);
+        } else if (lowerCaseMessage.includes("how many minutes have i spent working out since i started my journey?")) {
+            db.getWorkoutMinutesCount(res, user_email);
+        } else if (lowerCaseMessage.includes("how many workout programs have i completed so far?")) {
+            db.getWorkoutProgramsCount(res, user_email);
+        } else if (lowerCaseMessage === 'bye' || lowerCaseMessage === 'goodbye' || lowerCaseMessage === 'see you later' || lowerCaseMessage === 'see you' || lowerCaseMessage === 'talk to you later') {
+            response = "Goodbye! Have a great day!";
+            res.json(response);
+        } else {
+            response = "Please choose one of the options provided.";
+            res.json(response);
+        }
+    } catch(err) {
+        console.log("Error: ", err);
+        res.json("Internal server error");
     }
 }
 
@@ -219,6 +228,24 @@ function getProfileDetails(req, res) {
     let user_email = req.params.email;
     db.getProfileDetails(res, user_email);
 }
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+async function chatWithAI(req, res) {
+    try {
+        const chat = model.startChat({
+            history: req.body.history
+        });
+        const msg = req.body.message;
+        const result = await chat.sendMessage(msg);
+        res.send(result.response.text());
+    } catch (error) {
+        console.error("Error in chatWithAI:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
 
 // Start the server on port 8080
 app.listen(8080, () => {
