@@ -4,17 +4,21 @@ Node.js API for the [MyJourney](https://github.com/haingo-raz/MyJourney) web app
 # Functionalities
 - Sign up a user
 - Log in a user
+- Delete an account
 - Update a user's email
 - Update a user's password
 - Create a workout instance
 - Get a list of workouts by user email and date
 - Edit a workout instance by ID
 - Delete a workout instance by ID
+- Respond to predefined questions
+- Chat with an AI
 
 # Technology
 - Node.js/Express
 - MySQL
 - Azure SQL
+- GEMINI API (Get your own API key [here](https://ai.google.dev/gemini-api/docs/api-key). Then add it to your .env file.)
 
 # Architecture
 In progress
