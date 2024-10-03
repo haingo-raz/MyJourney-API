@@ -119,7 +119,7 @@ function getWorkoutByUserAndDate(res, email, date) {
 
     db.query(aggregateSql, [email, date], (err, aggregateResult) => {
         console.log("Aggregate SQL query: ", aggregateSql);
-        if (err) return err.json(err);
+        if (err) return res.json(err);
 
         db.query(detailsSql, [email, date], (err, detailsResult) => {
             if (err) return err.json(err);
