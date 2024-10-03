@@ -1,5 +1,6 @@
 # About 
 Node.js API for the [MyJourney](https://github.com/haingo-raz/MyJourney) web application.
+MyJourney is a web application where users can create, save, and edit their workout journey. Furthermore, they have the option to chat with an AI or ask questions about their journey.
 
 # Functionalities
 - Sign up a user
@@ -16,16 +17,13 @@ Node.js API for the [MyJourney](https://github.com/haingo-raz/MyJourney) web app
 
 # Technology
 - Node.js/Express
-- MySQL
-- Azure SQL
+- MySQL (option 1)
+- Azure SQL (option 2)
 - GEMINI API (Get your own API key [here](https://ai.google.dev/gemini-api/docs/api-key). Then add it to your .env file.)
-
-# Architecture
-In progress
 
 # How to run it on your computer
 1. Clone the project using the command `git clone https://github.com/haingo-raz/MyJourney-API.git`.
-2. Run `npm install`.
+2. Run `npm install` to install packages and dependencies.
 
 ## MySQL database
 1. Set up the environment variables by creating a .env file. Follow the template of the example.env file. `DB_HOST` is the hostname, usually localhost. `DB_MYSQL_USER` and `DB_MYSQL_PASSWORD` are the username and password used to authenticate the connection to the MySQL database. `DB_MYSQL_DATABASE` is the name of the database with the MySQL server. A dummy SQL database is made available in the [database dump](/database_dump) folder.
