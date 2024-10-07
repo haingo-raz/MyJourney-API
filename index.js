@@ -1,12 +1,11 @@
 const express = require('express');
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const db = require('./database');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 const fetch = require("node-fetch");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-
 
 // Initialize express
 const app = express();
@@ -21,7 +20,7 @@ app.get("/", (req, res) => {
 app.post("/login", login);
 app.post("/signup", signUp);
 app.post("/add", addWorkout);
-app.post("/chat", chat)
+app.post("/chat", chat);
 app.post("/chat/ai", chatWithAI);
 
 app.get("/workout/:email/:date", getWorkoutByUserAndDate);
@@ -38,7 +37,6 @@ app.delete("/delete-account", deleteAccount);
 async function login(req, res) {
     try {
         const userInfo = req.body;
-        // Retrieve the user from the database from the email
         db.getUserByEmail(userInfo.email, async (err, user) => {
             if (err) {
                 console.log("Error: ", err);
@@ -48,25 +46,24 @@ async function login(req, res) {
                 if (validPass) {
                     res.status(200).json({ message: "Success", email: user.email });
                 } else {
-                    res.json("Invalid email or password");
+                    res.status(400).json({ message: "Invalid email or password" });
                 }
             } else {
-                res.json("User not found");
+                res.status(404).json({ message: "User not found" });
             }
         });
     } catch (err) {
         console.log("Error: ", err);
+        res.status(500).json({ message: "Internal server error" });
     }
 }
 
 async function signUp(req, res) {
     const { email, password } = req.body;
-
-    // Encrypt password before storing into database
     const password_crypted = await bcrypt.hash(password, salt);
 
     if (email && password_crypted) {
-        db.signUp(res, email, password_crypted);
+        await db.signUp(res, email, password_crypted);
     } else {
         res.status(400).json({ error: 'Username and password are required' });
     }
@@ -78,7 +75,10 @@ function addWorkout(req, res) {
     if (workout) {
         db.addWorkout(res, workout)
             .then(() => console.log('added workout'))
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({ error: 'Internal server error' });
+            });
     } else {
         res.status(400).json({ error: 'Email, videoUrl, title and duration are required' });
     }
@@ -118,12 +118,13 @@ function updateEmail(req, res) {
                 if (validPass) {
                     db.updateEmail(res, email, newEmail);
                 } else {
-                    res.json("Invalid password");
+                    res.status(400).json({ message: "Invalid password" });
                 }
             }
         });
     } catch (err) {
         console.log("Error: ", err);
+        res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -142,12 +143,13 @@ function updatePassword(req, res) {
                     const new_password_crypted = await bcrypt.hash(newPassword, salt);
                     db.updatePassword(res, email, new_password_crypted);
                 } else {
-                    res.json("Invalid password");
+                    res.status(400).json({ message: "Invalid password" });
                 }
             }
         });
     } catch (err) {
         console.log("Error: ", err);
+        res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -164,12 +166,13 @@ function deleteAccount(req, res) {
                 if (validPass) {
                     db.deleteAccount(res, details.email);
                 } else {
-                    res.json("Invalid password");
+                    res.status(400).json({ message: "Invalid password" });
                 }
             }
         });
     } catch (err) {
         console.log("Error: ", err);
+        res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -199,7 +202,7 @@ function chat(req, res) {
         }
     } catch(err) {
         console.log("Error: ", err);
-        res.json("Internal server error");
+        res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -245,7 +248,6 @@ async function chatWithAI(req, res) {
         res.status(500).json({ error: "Internal server error" });
     }
 }
-
 
 // Start the server on port 8080
 app.listen(8080, () => {
