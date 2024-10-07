@@ -1,11 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const db = require('./database');
-const bcrypt = require('bcrypt');
-require('dotenv').config();
-const fetch = require("node-fetch");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import * as db from './database.js';
+import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
+dotenv.config();
 
 // Initialize express
 const app = express();
@@ -253,3 +254,5 @@ async function chatWithAI(req, res) {
 app.listen(8080, () => {
     console.log("Server is running on port 8080");
 });
+
+export default app;

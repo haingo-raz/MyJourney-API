@@ -1,5 +1,7 @@
-const mysql = require('mysql');
-require('dotenv').config();
+import mysql from 'mysql';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Configuration for the database connection
 const db = mysql.createConnection({
@@ -246,13 +248,13 @@ function getWorkoutProgramsCount(res, user_email) {
     }
 }
 
-module.exports = {
-    getWorkoutByUserAndDate,
+export {
     getUserByEmail,
     signUp,
     addWorkout,
     editWorkoutById,
     deleteWorkoutById,
+    getWorkoutByUserAndDate,
     updateEmail,
     updatePassword,
     deleteAccount,
