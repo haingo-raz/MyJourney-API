@@ -140,6 +140,7 @@ async function updateEmail(res, email, newEmail) {
         try {
             db.query(`SET FOREIGN_KEY_CHECKS = 0`);
             db.query(`UPDATE workout SET user_email = ? WHERE user_email = ?`, [newEmail, email]);
+            db.query(`UPDATE profile SET user_email = ? WHERE user_email = ?`, [newEmail, email]);
             db.query(`UPDATE users SET email = ? WHERE email = ?`, [newEmail, email]);
             db.query(`SET FOREIGN_KEY_CHECKS = 1`);
             db.commit((err) => {
