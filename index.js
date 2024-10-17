@@ -73,7 +73,7 @@ async function signUp(req, res) {
 function addWorkout(req, res) {
     let workout = req.body;
     console.log("Workout: ", JSON.stringify(workout));
-    if (workout) {
+    if (workout.title && workout.videoUrl && workout.duration && workout.user_email && workout.dayCreated && workout.status) {
         db.addWorkout(res, workout)
             .then(() => console.log('added workout'))
             .catch(err => {
