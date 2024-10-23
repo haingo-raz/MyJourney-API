@@ -24,6 +24,35 @@ MyJourney is a web application where users can create, save, and edit their work
 -   Azure SQL (option 2)
 -   GEMINI API (Get your own API key [here](https://ai.google.dev/gemini-api/docs/api-key). Then add it to your .env file.)
 
+# Database
+
+#### `users`
+
+-   `email`: varchar(200), PRIMARY KEY
+-   `password`: varchar(200)
+
+#### `profile`
+
+-   `profile_id`: int, PRIMARY KEY, AUTO_INCREMENT
+-   `age`: int
+-   `gender`: varchar(50)
+-   `height`: int
+-   `weight`: int
+-   `dailyIntakeCalorie`: int
+-   `fitnessGoals`: varchar(1000)
+-   `weight_goal`: int
+-   `user_email`: varchar(50), FOREIGN KEY referencing `users.email`
+
+#### `workout`
+
+-   `workoutId`: int, PRIMARY KEY, AUTO_INCREMENT
+-   `title`: varchar(200)
+-   `videoUrl`: varchar(500)
+-   `duration`: int
+-   `user_email`: varchar(50), FOREIGN KEY referencing `users.email`
+-   `dayCreated`: varchar(50)
+-   `status`: binary(50)
+
 # How to run it on your computer
 
 1. Clone the project using the command `git clone https://github.com/haingo-raz/MyJourney-API.git`.
@@ -50,3 +79,22 @@ After ensuring that all dependencies are installed, run `npm run test` in the te
 1. Ensure that your MySQL or Azure SQL database is set up and running.
 2. Populate the database with test data if necessary.
 3. Run `npm run test` to execute the unit tests. This command will run all test files located in the `tests` directory.
+
+## Code Formatting
+
+To keep the code format neat, make use of Prettier. The following npm scripts are available:
+
+-   `format:check`: Checks the code format using Prettier.
+-   `format:write`: Formats the code using Prettier.
+
+To check the code format, run:
+
+```sh
+npm run format:check
+```
+
+To format the code, run:
+
+```sh
+npm run format:write
+```
