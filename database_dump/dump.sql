@@ -25,68 +25,69 @@ CREATE TABLE IF NOT EXISTS `profile` (
   `gender` varchar(50) DEFAULT NULL,
   `height` int(11) DEFAULT NULL,
   `weight` int(11) DEFAULT NULL,
-  `dailyIntakeCalorie` int(11) DEFAULT NULL,
-  `fitnessGoals` varchar(1000) DEFAULT NULL,
+  `daily_intake_calorie` int(11) DEFAULT NULL,
+  `fitness_goals` varchar(1000) DEFAULT NULL,
   `weight_goal` int(11) DEFAULT NULL,
   `user_email` varchar(50) DEFAULT NULL,
   `profile_id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`profile_id`),
   KEY `FK_profile` (`user_email`),
-  CONSTRAINT `FK_profile` FOREIGN KEY (`user_email`) REFERENCES `users` (`email`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `FK_profile` FOREIGN KEY (`user_email`) REFERENCES `user` (`email`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table myjourney.profile: ~0 rows (approximately)
-REPLACE INTO `profile` (`age`, `gender`, `height`, `weight`, `dailyIntakeCalorie`, `fitnessGoals`, `weight_goal`, `user_email`, `profile_id`) VALUES
-	(20, 'male', 179, 68, 1000, NULL, NULL, 'testv4@mj.com', 1);
-  (NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'admin@mj.com', 2),
-  (NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'haingoraza@mj.com', 3),
-  (NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'testv3@mj.com', 4);
+-- Dumping data for table myjourney.profile: ~6 rows (approximately)
+REPLACE INTO `profile` (`age`, `gender`, `height`, `weight`, `daily_intake_calorie`, `fitness_goals`, `weight_goal`, `user_email`, `profile_id`) VALUES
+	(20, 'male', 179, 68, 1000, NULL, NULL, 'testv4@mj.com', 1),
+	(23, NULL, NULL, NULL, NULL, NULL, NULL, 'testv5new@mj.com', 2),
+	(NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'testca@mj.com', 3),
+	(NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'testadmin@mj.com', 4),
+	(20, 'male', 155, 55, 1200, 'Becoming healthier', 60, 'hr@mj.com', 5),
+	(20, 'female', 155, NULL, NULL, NULL, NULL, 'admin@mj.com', 9);
 
--- Dumping structure for table myjourney.users
-CREATE TABLE IF NOT EXISTS `users` (
+-- Dumping structure for table myjourney.user
+CREATE TABLE IF NOT EXISTS `user` (
   `email` varchar(200) NOT NULL,
   `password` varchar(200) NOT NULL,
   PRIMARY KEY (`email`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Dumping data for table myjourney.users: ~2 rows (approximately)
-REPLACE INTO `users` (`email`, `password`) VALUES
-	('testv4@mj.com', '$2b$10$1YDiuYJ5EGLyW/1g6PK/q.ab.tkHNih8xxSYGW7PE//MQ.DxfB.Dm');
-	('admin@mj.com', '$2b$10$tKYfDJjIGfsdtDddb5pZAOMaW6dUfRg99IurtR4D9uUneKySxWx6O'),
-	('haingoraza@mj.com', '$2b$10$tFl4nUs8vNpH2Vk9Nl4yle9fFyFlLTCNCHeDW1SYEIzs0NHqnv0va'),
-	('testv3@mj.com', '$2b$10$U.MzuFaiTlCpKf6.WLXYEedETKySV80kRHXY2te3nCF6ALZrKHMdS'),
-
+-- Dumping data for table myjourney.user: ~5 rows (approximately)
+REPLACE INTO `user` (`email`, `password`) VALUES
+	('admin@mj.com', '$2b$10$3GZKrM9iAeu7TeMP3PTce.4LyNN.cTg/.sda.XNX685PKMMYie9qm'),
+	('testadmin@mj.com', '$2b$10$KZRvspPC9P5QNhwGJ3ESROMUlkMEwFb87eiQXh0dRcR1Pm0tnuc2O'),
+	('testca@mj.com', '$2b$10$eh0271zk/ciUAf35snHnq.4gd0JdA5J2bX8pa/cur44zd1qWWVsu.'),
+	('testv4@mj.com', '$2b$10$1YDiuYJ5EGLyW/1g6PK/q.ab.tkHNih8xxSYGW7PE//MQ.DxfB.Dm'),
+	('testv5new@mj.com', '$2b$10$jeeE4zDI/EhKCZm3NXCjfeqh9KpLT5OCF1PWnEDWxacqb6OXMMOke');
 
 -- Dumping structure for table myjourney.workout
 CREATE TABLE IF NOT EXISTS `workout` (
-  `workoutId` int(11) NOT NULL AUTO_INCREMENT,
+  `workout_id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(200) NOT NULL,
-  `videoUrl` varchar(500) NOT NULL,
+  `video_url` varchar(500) NOT NULL,
   `duration` int(11) NOT NULL,
   `user_email` varchar(50) NOT NULL,
-  `dayCreated` varchar(50) NOT NULL,
+  `day_created` varchar(50) NOT NULL,
   `status` binary(50) NOT NULL,
-  PRIMARY KEY (`workoutId`),
+  PRIMARY KEY (`workout_id`) USING BTREE,
   KEY `FK_users` (`user_email`),
-  CONSTRAINT `FK_users` FOREIGN KEY (`user_email`) REFERENCES `users` (`email`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  CONSTRAINT `FK_users` FOREIGN KEY (`user_email`) REFERENCES `user` (`email`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Dumping data for table myjourney.workout: ~13 rows (approximately)
-REPLACE INTO `workout` (`workoutId`, `title`, `videoUrl`, `duration`, `user_email`, `dayCreated`, `status`) VALUES
+REPLACE INTO `workout` (`workout_id`, `title`, `video_url`, `duration`, `user_email`, `day_created`, `status`) VALUES
 	(4, 'Cardio Fitness', 'https://www.youtube.com/watch?v=tpwRmyzyiwM', 4, 'admin@mj.com', '2024-09-18', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
 	(5, 'Cardio Fitness Marshall Test', 'https://www.youtube.com/watch?v=tpwRmyzyiwM', 4, 'admin@mj.com', '2024-09-18', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
-	(7, 'Abs workout Chloe', 'https://www.youtube.com/watch?v=2pLT-olgUJs', 11, 'haingoraza@mj.com', '2024-09-18', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
-	(9, 'Crazy Abs Day 2', 'https://www.youtube.com/watch?v=2pLT-olgUJs', 11, 'haingoraza@mj.com', '2024-09-18', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
-	(11, 'ABS in 2 weeks', 'https://www.youtube.com/watch?v=2pLT-olgUJs', 11, 'haingoraza@mj.com', '2024-09-18', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
-	(14, 'test', 'https://www.youtube.com/dsfsfd', 10, 'testv3@mj.com', '2024-09-28', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
-	(15, 'test', 'https://www.youtube.com/kjgjgh', 10, 'testv3@mj.com', '2024-09-28', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
-	(16, 'test', 'https://www.youtube.com/khkjhj', 10, 'testv3@mj.com', '2024-09-28', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
-	(18, '20 Min Cardio HIIT Workout - Full Body, No Repeats, No Equipment', 'https://www.youtube.com/watch?v=DlnfCNGoGM4', 20, 'testv3@mj.com', '2024-10-01', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
-	(19, 'Do This Everyday To Lose Weight | 2 Weeks Shred Challenge', 'https://www.youtube.com/watch?v=2MoGxae-zyo', 14, 'testv3@mj.com', '2024-10-01', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
 	(20, 'Do This Everyday To Lose Weight | 2 Weeks Shred Challenge', 'https://www.youtube.com/watch?v=2MoGxae-zyo', 14, 'testv4@mj.com', '2024-10-01', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
 	(21, 'Best Full Body Workout to Lose Fat ????????20 mins | 28 Day Challenge', 'https://www.youtube.com/watch?v=CGmr02bfHUo', 21, 'testv4@mj.com', '2024-10-01', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
 	(22, '15 min Intense HIIT for Fat Burn | Standing & No Equipment', 'https://www.youtube.com/watch?v=9rQ5wxssQss', 16, 'testv4@mj.com', '2024-10-02', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
-	(23, 'Get Shredded for the Summer! 15 min Standing HIIT Workout', 'https://www.youtube.com/watch?v=JDgc6CxwEMI', 15, 'testv4@mj.com', '2024-10-02', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000);
+	(23, 'Get Shredded for the Summer! 15 min Standing HIIT Workout', 'https://www.youtube.com/watch?v=JDgc6CxwEMI', 15, 'testv4@mj.com', '2024-10-02', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
+	(24, 'Zumba', 'https://www.youtube.com/watch?v=mZeFvX3ALKY', 31, 'testv5new@mj.com', '2024-10-06', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
+	(26, 'Test Workout', 'Test Description', 3, 'admin@mj.com', '2024-10-17', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
+	(30, 'Test Workout', 'https://www.youtube.com/watch?v=kuH-RRf6WP0', 21, 'admin@mj.com', '2024-10-17', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
+	(32, '20 MIN FULL BODY WORKOUT // No Equipment | Pamela Reif', 'https://www.youtube.com/watch?v=UBMk30rjy0o', 20, 'testca@mj.com', '2024-11-19', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
+	(34, 'Test Workout', 'https://www.youtube.com/watch?v=kuH-RRf6WP0', 21, 'admin@mj.com', '2024-10-17', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
+	(35, '20 Minute ', 'https://www.youtube.com/watch?v=M0uO8X3_tEA', 29, 'admin@mj.com', '2024-11-20', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000),
+	(36, '10MIN everyday full body hourglass pilates workout // no equipment // beginner friendly', 'https://www.youtube.com/watch?v=u3UjeyPOjoU', 11, 'admin@mj.com', '2024-12-11', _binary 0x46616c7365000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

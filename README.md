@@ -38,19 +38,19 @@ MyJourney is a web application where users can create, save, and edit their work
 -   `gender`: varchar(50)
 -   `height`: int
 -   `weight`: int
--   `dailyIntakeCalorie`: int
--   `fitnessGoals`: varchar(1000)
+-   `daily_intake-calorie`: int
+-   `fitness_goals`: varchar(1000)
 -   `weight_goal`: int
 -   `user_email`: varchar(50), FOREIGN KEY referencing `users.email`
 
 #### `workout`
 
--   `workoutId`: int, PRIMARY KEY, AUTO_INCREMENT
+-   `workout_id`: int, PRIMARY KEY, AUTO_INCREMENT
 -   `title`: varchar(200)
--   `videoUrl`: varchar(500)
+-   `video_url`: varchar(500)
 -   `duration`: int
 -   `user_email`: varchar(50), FOREIGN KEY referencing `users.email`
--   `dayCreated`: varchar(50)
+-   `day_created`: varchar(50)
 -   `status`: binary(50)
 
 # How to run it on your computer

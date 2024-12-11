@@ -83,10 +83,10 @@ function addWorkout(req, res) {
     console.log('Workout: ', JSON.stringify(workout))
     if (
         workout.title &&
-        workout.videoUrl &&
+        workout.video_url &&
         workout.duration &&
         workout.user_email &&
-        workout.dayCreated &&
+        workout.day_created &&
         workout.status
     ) {
         db.addWorkout(res, workout)
@@ -97,7 +97,7 @@ function addWorkout(req, res) {
             })
     } else {
         res.status(400).json({
-            error: 'Email, videoUrl, title and duration are required',
+            error: 'Email, video_url, title and duration are required',
         })
     }
 }
@@ -108,7 +108,7 @@ function editWorkoutById(req, res) {
         db.editWorkoutById(res, workout)
     } else {
         res.status(400).json({
-            error: 'Email, videoUrl, title and duration are required',
+            error: 'Email, video_url, title and duration are required',
         })
     }
 }
@@ -267,9 +267,9 @@ function addProfile(req, res) {
         gender: profileData.gender || null,
         height: profileData.height || null,
         weight: profileData.weight || null,
-        dailyIntakeCalorie: profileData.dailyIntakeCalorie || null,
-        fitnessGoals: profileData.fitnessGoals || null,
-        weightGoal: profileData.weightGoal || null,
+        daily_intake_calorie: profileData.dailyIntakeCalorie || null,
+        fitness_goals: profileData.fitnessGoals || null,
+        weight_goal: profileData.weightGoal || null,
     }
     let updateFields = []
     for (let key in profileDetails) {

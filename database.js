@@ -14,7 +14,7 @@ const db = mysql.createConnection({
 console.log('Starting...')
 
 async function getUserByEmail(email, callback) {
-    let sql = `SELECT * FROM users WHERE email = ?`
+    let sql = `SELECT * FROM user WHERE email = ?`
     db.query(sql, [email], (err, result) => {
         if (err) return callback(err)
         return callback(null, result[0])
@@ -28,7 +28,7 @@ async function signUp(res, email, password_crypted) {
         }
 
         try {
-            let sql = `INSERT INTO users (email, password) VALUES (?, ?)`
+            let sql = `INSERT INTO user (email, password) VALUES (?, ?)`
             let sql2 = `INSERT INTO profile (user_email) VALUES (?)`
 
             db.query(sql, [email, password_crypted], (err, result) => {
@@ -65,15 +65,15 @@ async function signUp(res, email, password_crypted) {
 
 async function addWorkout(res, workout) {
     try {
-        let sql = `INSERT INTO workout (title, videoUrl, duration, user_email, dayCreated, status) VALUES (?, ?, ?, ?, ?, ?)`
+        let sql = `INSERT INTO workout (title, video_url, duration, user_email, day_created, status) VALUES (?, ?, ?, ?, ?, ?)`
         db.query(
             sql,
             [
                 workout.title,
-                workout.videoUrl,
+                workout.video_url,
                 workout.duration,
                 workout.user_email,
-                workout.dayCreated,
+                workout.day_created,
                 workout.status,
             ],
             (err, result) => {
@@ -88,14 +88,14 @@ async function addWorkout(res, workout) {
 
 async function editWorkoutById(res, workout) {
     try {
-        let sql = `UPDATE workout SET title = ?, videoUrl = ?, duration = ? WHERE workoutId = ?`
+        let sql = `UPDATE workout SET title = ?, video_url = ?, duration = ? WHERE workout_id = ?`
         db.query(
             sql,
             [
                 workout.title,
-                workout.videoUrl,
+                workout.video_url,
                 workout.duration,
-                workout.workoutId,
+                workout.workout_id,
             ],
             (err, result) => {
                 if (err) return res.json(err)
@@ -109,7 +109,7 @@ async function editWorkoutById(res, workout) {
 
 async function deleteWorkoutById(res, id) {
     try {
-        let sql = `DELETE FROM workout WHERE workoutId = ?`
+        let sql = `DELETE FROM workout WHERE workout_id = ?`
         db.query(sql, [id], (err, result) => {
             if (err) return res.json(err)
             return res.json('Success')
@@ -119,21 +119,21 @@ async function deleteWorkoutById(res, id) {
     }
 }
 
-function getWorkoutByUserAndDate(res, email, date) {
+async function getWorkoutByUserAndDate(res, email, date) {
     const aggregateSql = `
         SELECT 
             COUNT(*) AS workoutCount, 
             SUM(duration) AS totalDuration 
         FROM workout 
         WHERE user_email = ? 
-          AND dayCreated = ?
+          AND day_created = ?
     `
 
     const detailsSql = `
         SELECT * 
         FROM workout 
         WHERE user_email = ? 
-          AND dayCreated = ?
+          AND day_created = ?
     `
 
     db.query(aggregateSql, [email, date], (err, aggregateResult) => {
@@ -169,7 +169,7 @@ async function updateEmail(res, email, newEmail) {
                 newEmail,
                 email,
             ])
-            db.query(`UPDATE users SET email = ? WHERE email = ?`, [
+            db.query(`UPDATE user SET email = ? WHERE email = ?`, [
                 newEmail,
                 email,
             ])
@@ -192,7 +192,7 @@ async function updateEmail(res, email, newEmail) {
 
 async function updatePassword(res, email, password_crypted) {
     try {
-        let sql = `UPDATE users SET password = ? WHERE email = ?`
+        let sql = `UPDATE user SET password = ? WHERE email = ?`
         db.query(sql, [password_crypted, email], (err, result) => {
             if (err) return res.json(err)
             return res.json('Success')
@@ -209,7 +209,7 @@ async function deleteAccount(res, email) {
         }
         try {
             db.query(`SET FOREIGN_KEY_CHECKS = 0`)
-            db.query(`DELETE FROM users WHERE email = ?`, [email])
+            db.query(`DELETE FROM user WHERE email = ?`, [email])
             db.query(`DELETE FROM workout WHERE user_email = ?`, [email])
             db.query(`SET FOREIGN_KEY_CHECKS = 1`)
             db.commit((err) => {
@@ -228,7 +228,7 @@ async function deleteAccount(res, email) {
     })
 }
 
-function saveProfile(res, user_email, updateFields) {
+async function saveProfile(res, user_email, updateFields) {
     try {
         if (updateFields.length === 0) {
             return res.json('No fields to update')
@@ -243,7 +243,7 @@ function saveProfile(res, user_email, updateFields) {
     }
 }
 
-function getProfileDetails(res, user_email) {
+async function getProfileDetails(res, user_email) {
     let sql = `SELECT * FROM profile WHERE user_email = ?`
     db.query(sql, [user_email], (err, result) => {
         if (err) return res.json(err)
@@ -251,7 +251,7 @@ function getProfileDetails(res, user_email) {
     })
 }
 
-function getWorkoutMinutesCount(res, user_email) {
+async function getWorkoutMinutesCount(res, user_email) {
     try {
         let sql = `SELECT SUM(duration) AS totalDuration FROM workout WHERE user_email = ?`
         db.query(sql, [user_email], (err, result) => {
@@ -264,7 +264,7 @@ function getWorkoutMinutesCount(res, user_email) {
     }
 }
 
-function getWorkoutProgramsCount(res, user_email) {
+async function getWorkoutProgramsCount(res, user_email) {
     try {
         let sql = `SELECT COUNT(*) AS totalWorkouts FROM workout WHERE user_email = ?`
         db.query(sql, [user_email], (err, result) => {
