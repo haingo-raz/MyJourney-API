@@ -38,7 +38,7 @@ MyJourney is a web application where users can create, save, and edit their work
 -   `gender`: varchar(50)
 -   `height`: int
 -   `weight`: int
--   `daily_intake-calorie`: int
+-   `daily_intake_calorie`: int
 -   `fitness_goals`: varchar(1000)
 -   `weight_goal`: int
 -   `user_email`: varchar(50), FOREIGN KEY referencing `users.email`
