@@ -211,6 +211,7 @@ async function deleteAccount(res, email) {
             db.query(`SET FOREIGN_KEY_CHECKS = 0`)
             db.query(`DELETE FROM user WHERE email = ?`, [email])
             db.query(`DELETE FROM workout WHERE user_email = ?`, [email])
+            db.query(`DELETE FROM profile WHERE user_email = ?`, [email])
             db.query(`SET FOREIGN_KEY_CHECKS = 1`)
             db.commit((err) => {
                 if (err) {
