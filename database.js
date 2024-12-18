@@ -278,6 +278,19 @@ async function getWorkoutProgramsCount(res, user_email) {
     }
 }
 
+async function getWorkoutDaysCount(res, user_email) {
+    try {
+        let sql = `SELECT COUNT(DISTINCT day_created) AS totalDays FROM workout WHERE user_email = ?`
+        db.query(sql, [user_email], (err, result) => {
+            if (err) return res.json(err)
+            let response = `You have trained for a total of ${result[0].totalDays} days.`
+            return res.json(response)
+        })
+    } catch (err) {
+        return res.json(err)
+    }
+}
+
 export {
     getUserByEmail,
     signUp,
@@ -292,4 +305,5 @@ export {
     getProfileDetails,
     getWorkoutMinutesCount,
     getWorkoutProgramsCount,
+    getWorkoutDaysCount,
 }

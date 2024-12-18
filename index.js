@@ -241,6 +241,12 @@ function chat(req, res) {
         ) {
             db.getWorkoutProgramsCount(res, user_email)
         } else if (
+            lowerCaseMessage.includes(
+                'how many days have i worked out since i started my journey?'
+            )
+        ) {
+            db.getWorkoutDaysCount(res, user_email)
+        } else if (
             lowerCaseMessage === 'bye' ||
             lowerCaseMessage === 'goodbye' ||
             lowerCaseMessage === 'see you later' ||
