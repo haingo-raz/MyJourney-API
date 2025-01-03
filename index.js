@@ -273,9 +273,9 @@ function addProfile(req, res) {
         gender: profileData.gender || null,
         height: profileData.height || null,
         weight: profileData.weight || null,
-        daily_intake_calorie: profileData.dailyIntakeCalorie || null,
-        fitness_goals: profileData.fitnessGoals || null,
-        weight_goal: profileData.weightGoal || null,
+        daily_intake_calorie: profileData.daily_intake_calorie || null,
+        fitness_goals: profileData.fitness_goals || null,
+        weight_goal: profileData.weight_goal || null,
     }
     let updateFields = []
     for (let key in profileDetails) {
