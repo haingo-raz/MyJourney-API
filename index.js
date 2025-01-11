@@ -71,11 +71,22 @@ async function signUp(req, res) {
     const { email, password } = req.body
     const password_crypted = await bcrypt.hash(password, salt)
 
-    if (email && password_crypted) {
-        await db.signUp(res, email, password_crypted)
-    } else {
-        res.status(400).json({ error: 'Username and password are required' })
-    }
+    db.getUserByEmail(email, async (err, user) => {
+        if (user) {
+            return res.status(400).json({ message: 'User already exists' })
+        } else {
+            if (email && password_crypted) {
+                await db.signUp(res, email, password_crypted)
+                return res
+                    .status(201)
+                    .json({ message: 'User created successfully' })
+            } else {
+                return res
+                    .status(400)
+                    .json({ error: 'Username and password are required' })
+            }
+        }
+    })
 }
 
 function addWorkout(req, res) {
