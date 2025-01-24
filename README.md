@@ -51,7 +51,7 @@ MyJourney is a web application where users can create, save, and edit their work
 -   `duration`: int
 -   `user_email`: varchar(50), FOREIGN KEY referencing `users.email`
 -   `day_created`: varchar(50)
--   `status`: binary(50)
+-   `status`: tinyint(1)
 
 # How to run it on your computer
 
