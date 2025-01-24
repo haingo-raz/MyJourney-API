@@ -4,7 +4,7 @@ import app from '../index.js'
 
 describe('Profile Tests', () => {
     it('should return the profile details of a user based on their email', (done) => {
-        const user_email = 'testv4@mj.com'
+        const user_email = 'admin@mj.com'
 
         request(app)
             .get(`/profile/${user_email}`)
