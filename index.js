@@ -31,6 +31,7 @@ app.put('/edit/:id', editWorkoutById)
 app.put('/update-email', updateEmail)
 app.put('/update-password', updatePassword)
 app.put('/profile', addProfile)
+app.put('/workout/status/:id', editWorkoutStatusById)
 
 app.delete('/delete/:id', deleteWorkoutById)
 app.delete('/delete-account', deleteAccount)
@@ -122,6 +123,15 @@ function editWorkoutById(req, res) {
             error: 'Email, video_url, title and duration are required',
         })
     }
+}
+
+function editWorkoutStatusById(req, res) {
+    const workoutId = req.params.id
+    const { status } = req.body
+
+    if (status !== undefined && workoutId !== undefined) {
+        db.editWorkoutStatusById(res, status, workoutId)
+    } else res.status(400).json({ error: 'Status and id are required' })
 }
 
 function deleteWorkoutById(req, res) {

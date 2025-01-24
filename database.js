@@ -107,6 +107,18 @@ async function editWorkoutById(res, workout) {
     }
 }
 
+function editWorkoutStatusById(res, status, workoutId) {
+    try {
+        let sql = `UPDATE workout SET status = ? WHERE workout_id = ?`
+        db.query(sql, [status, workoutId], (err, result) => {
+            if (err) return res.json(err)
+            return res.json('Success')
+        })
+    } catch (err) {
+        return res.json(err)
+    }
+}
+
 async function deleteWorkoutById(res, id) {
     try {
         let sql = `DELETE FROM workout WHERE workout_id = ?`
@@ -254,7 +266,7 @@ async function getProfileDetails(res, user_email) {
 
 async function getWorkoutMinutesCount(res, user_email) {
     try {
-        let sql = `SELECT SUM(duration) AS totalDuration FROM workout WHERE user_email = ?`
+        let sql = `SELECT SUM(duration) AS totalDuration FROM workout WHERE user_email = ? AND status = 1`
         db.query(sql, [user_email], (err, result) => {
             if (err) return res.json(err)
             let response = `You have trained for a total of ${result[0].totalDuration} minutes.`
@@ -267,7 +279,7 @@ async function getWorkoutMinutesCount(res, user_email) {
 
 async function getWorkoutProgramsCount(res, user_email) {
     try {
-        let sql = `SELECT COUNT(*) AS totalWorkouts FROM workout WHERE user_email = ?`
+        let sql = `SELECT COUNT(*) AS totalWorkouts FROM workout WHERE user_email = ? AND status = 1`
         db.query(sql, [user_email], (err, result) => {
             if (err) return res.json(err)
             let response = `You have completed a total of ${result[0].totalWorkouts} workout programs.`
@@ -280,7 +292,7 @@ async function getWorkoutProgramsCount(res, user_email) {
 
 async function getWorkoutDaysCount(res, user_email) {
     try {
-        let sql = `SELECT COUNT(DISTINCT day_created) AS totalDays FROM workout WHERE user_email = ?`
+        let sql = `SELECT COUNT(DISTINCT day_created) AS totalDays FROM workout WHERE user_email = ? AND status = 1`
         db.query(sql, [user_email], (err, result) => {
             if (err) return res.json(err)
             let response = `You have trained for a total of ${result[0].totalDays} days.`
@@ -296,6 +308,7 @@ export {
     signUp,
     addWorkout,
     editWorkoutById,
+    editWorkoutStatusById,
     deleteWorkoutById,
     getWorkoutByUserAndDate,
     updateEmail,
